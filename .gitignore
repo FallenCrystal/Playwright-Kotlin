@@ -1,0 +1,32 @@
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Node
+server/node_modules/
+server/dist/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Kotlin
+*.class
+.kotlin/
+
+# Env
+local.properties
+.env
+.env*.local
+
+# Logs
+*.log
+
+# Bundle
+server/bundle/

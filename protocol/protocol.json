@@ -1,0 +1,842 @@
+{
+  "version": "1.0.0",
+  "types": {
+    "Playwright": {
+      "methods": {
+        "initialize": {
+          "params": {},
+          "returns": {
+            "type": "object",
+            "properties": {
+              "chromium": { "type": "object", "objectType": "BrowserType" },
+              "firefox": { "type": "object", "objectType": "BrowserType" },
+              "webkit": { "type": "object", "objectType": "BrowserType" }
+            }
+          }
+        },
+        "close": {
+          "params": {},
+          "returns": { "type": "void" }
+        }
+      }
+    },
+    "BrowserType": {
+      "methods": {
+        "launch": {
+          "params": {
+            "headless": { "type": "boolean", "required": false },
+            "channel": { "type": "string", "required": false },
+            "executablePath": { "type": "string", "required": false },
+            "args": { "type": "array", "items": "string", "required": false },
+            "timeout": { "type": "number", "required": false },
+            "slowMo": { "type": "number", "required": false }
+          },
+          "returns": { "type": "object", "objectType": "Browser" }
+        },
+        "name": {
+          "params": {},
+          "returns": { "type": "string" }
+        }
+      }
+    },
+    "Browser": {
+      "methods": {
+        "newContext": {
+          "params": {
+            "viewport": { "type": "object", "objectType": "ViewportSize", "required": false },
+            "userAgent": { "type": "string", "required": false },
+            "locale": { "type": "string", "required": false },
+            "timezoneId": { "type": "string", "required": false },
+            "ignoreHTTPSErrors": { "type": "boolean", "required": false },
+            "javaScriptEnabled": { "type": "boolean", "required": false },
+            "bypassCSP": { "type": "boolean", "required": false },
+            "deviceScaleFactor": { "type": "number", "required": false }
+          },
+          "returns": { "type": "object", "objectType": "BrowserContext" }
+        },
+        "newPage": {
+          "params": {
+            "viewport": { "type": "object", "objectType": "ViewportSize", "required": false },
+            "userAgent": { "type": "string", "required": false },
+            "locale": { "type": "string", "required": false },
+            "ignoreHTTPSErrors": { "type": "boolean", "required": false }
+          },
+          "returns": { "type": "object", "objectType": "Page" }
+        },
+        "close": {
+          "params": {},
+          "returns": { "type": "void" }
+        },
+        "contexts": {
+          "params": {},
+          "returns": { "type": "array", "items": { "type": "object", "objectType": "BrowserContext" } }
+        },
+        "isConnected": {
+          "params": {},
+          "returns": { "type": "boolean" }
+        },
+        "version": {
+          "params": {},
+          "returns": { "type": "string" }
+        }
+      },
+      "events": ["disconnected"]
+    },
+    "BrowserContext": {
+      "methods": {
+        "newPage": {
+          "params": {},
+          "returns": { "type": "object", "objectType": "Page" }
+        },
+        "pages": {
+          "params": {},
+          "returns": { "type": "array", "items": { "type": "object", "objectType": "Page" } }
+        },
+        "cookies": {
+          "params": {
+            "urls": { "type": "array", "items": "string", "required": false }
+          },
+          "returns": { "type": "array", "items": { "type": "object", "objectType": "Cookie" } }
+        },
+        "addCookies": {
+          "params": {
+            "cookies": { "type": "array", "items": { "type": "object", "objectType": "Cookie" }, "required": true }
+          },
+          "returns": { "type": "void" }
+        },
+        "clearCookies": {
+          "params": {},
+          "returns": { "type": "void" }
+        },
+        "close": {
+          "params": {},
+          "returns": { "type": "void" }
+        },
+        "setDefaultTimeout": {
+          "params": {
+            "timeout": { "type": "number", "required": true }
+          },
+          "returns": { "type": "void" }
+        },
+        "setDefaultNavigationTimeout": {
+          "params": {
+            "timeout": { "type": "number", "required": true }
+          },
+          "returns": { "type": "void" }
+        }
+      },
+      "events": ["close", "page"]
+    },
+    "Page": {
+      "methods": {
+        "goto": {
+          "params": {
+            "url": { "type": "string", "required": true },
+            "timeout": { "type": "number", "required": false },
+            "waitUntil": { "type": "string", "required": false }
+          },
+          "returns": { "type": "object", "objectType": "Response", "nullable": true }
+        },
+        "reload": {
+          "params": {
+            "timeout": { "type": "number", "required": false },
+            "waitUntil": { "type": "string", "required": false }
+          },
+          "returns": { "type": "object", "objectType": "Response", "nullable": true }
+        },
+        "goBack": {
+          "params": {
+            "timeout": { "type": "number", "required": false },
+            "waitUntil": { "type": "string", "required": false }
+          },
+          "returns": { "type": "object", "objectType": "Response", "nullable": true }
+        },
+        "goForward": {
+          "params": {
+            "timeout": { "type": "number", "required": false },
+            "waitUntil": { "type": "string", "required": false }
+          },
+          "returns": { "type": "object", "objectType": "Response", "nullable": true }
+        },
+        "waitForLoadState": {
+          "params": {
+            "state": { "type": "string", "required": false },
+            "timeout": { "type": "number", "required": false }
+          },
+          "returns": { "type": "void" }
+        },
+        "locator": {
+          "params": {
+            "selector": { "type": "string", "required": true },
+            "hasText": { "type": "string", "required": false },
+            "hasNotText": { "type": "string", "required": false }
+          },
+          "returns": { "type": "object", "objectType": "Locator" }
+        },
+        "querySelector": {
+          "params": {
+            "selector": { "type": "string", "required": true }
+          },
+          "returns": { "type": "object", "objectType": "ElementHandle", "nullable": true }
+        },
+        "querySelectorAll": {
+          "params": {
+            "selector": { "type": "string", "required": true }
+          },
+          "returns": { "type": "array", "items": { "type": "object", "objectType": "ElementHandle" } }
+        },
+        "waitForSelector": {
+          "params": {
+            "selector": { "type": "string", "required": true },
+            "state": { "type": "string", "required": false },
+            "timeout": { "type": "number", "required": false }
+          },
+          "returns": { "type": "object", "objectType": "ElementHandle", "nullable": true }
+        },
+        "click": {
+          "params": {
+            "selector": { "type": "string", "required": true },
+            "button": { "type": "string", "required": false },
+            "clickCount": { "type": "number", "required": false },
+            "delay": { "type": "number", "required": false },
+            "timeout": { "type": "number", "required": false }
+          },
+          "returns": { "type": "void" }
+        },
+        "dblclick": {
+          "params": {
+            "selector": { "type": "string", "required": true },
+            "button": { "type": "string", "required": false },
+            "delay": { "type": "number", "required": false },
+            "timeout": { "type": "number", "required": false }
+          },
+          "returns": { "type": "void" }
+        },
+        "fill": {
+          "params": {
+            "selector": { "type": "string", "required": true },
+            "value": { "type": "string", "required": true },
+            "timeout": { "type": "number", "required": false }
+          },
+          "returns": { "type": "void" }
+        },
+        "type": {
+          "params": {
+            "selector": { "type": "string", "required": true },
+            "text": { "type": "string", "required": true },
+            "delay": { "type": "number", "required": false },
+            "timeout": { "type": "number", "required": false }
+          },
+          "returns": { "type": "void" }
+        },
+        "press": {
+          "params": {
+            "selector": { "type": "string", "required": true },
+            "key": { "type": "string", "required": true },
+            "delay": { "type": "number", "required": false },
+            "timeout": { "type": "number", "required": false }
+          },
+          "returns": { "type": "void" }
+        },
+        "evaluate": {
+          "params": {
+            "expression": { "type": "string", "required": true },
+            "arg": { "type": "any", "required": false }
+          },
+          "returns": { "type": "any" }
+        },
+        "evaluateHandle": {
+          "params": {
+            "expression": { "type": "string", "required": true },
+            "arg": { "type": "any", "required": false }
+          },
+          "returns": { "type": "any" }
+        },
+        "screenshot": {
+          "params": {
+            "path": { "type": "string", "required": false },
+            "type": { "type": "string", "required": false },
+            "quality": { "type": "number", "required": false },
+            "fullPage": { "type": "boolean", "required": false },
+            "timeout": { "type": "number", "required": false }
+          },
+          "returns": { "type": "buffer" }
+        },
+        "pdf": {
+          "params": {
+            "path": { "type": "string", "required": false },
+            "format": { "type": "string", "required": false },
+            "printBackground": { "type": "boolean", "required": false }
+          },
+          "returns": { "type": "buffer" }
+        },
+        "content": {
+          "params": {},
+          "returns": { "type": "string" }
+        },
+        "setContent": {
+          "params": {
+            "html": { "type": "string", "required": true },
+            "timeout": { "type": "number", "required": false },
+            "waitUntil": { "type": "string", "required": false }
+          },
+          "returns": { "type": "void" }
+        },
+        "title": {
+          "params": {},
+          "returns": { "type": "string" }
+        },
+        "url": {
+          "params": {},
+          "returns": { "type": "string" }
+        },
+        "close": {
+          "params": {
+            "runBeforeUnload": { "type": "boolean", "required": false }
+          },
+          "returns": { "type": "void" }
+        },
+        "isClosed": {
+          "params": {},
+          "returns": { "type": "boolean" }
+        },
+        "mainFrame": {
+          "params": {},
+          "returns": { "type": "object", "objectType": "Frame" }
+        },
+        "frames": {
+          "params": {},
+          "returns": { "type": "array", "items": { "type": "object", "objectType": "Frame" } }
+        },
+        "setViewportSize": {
+          "params": {
+            "viewportSize": { "type": "object", "objectType": "ViewportSize", "required": true }
+          },
+          "returns": { "type": "void" }
+        },
+        "viewportSize": {
+          "params": {},
+          "returns": { "type": "object", "objectType": "ViewportSize", "nullable": true }
+        },
+        "bringToFront": {
+          "params": {},
+          "returns": { "type": "void" }
+        },
+        "setDefaultTimeout": {
+          "params": {
+            "timeout": { "type": "number", "required": true }
+          },
+          "returns": { "type": "void" }
+        },
+        "setDefaultNavigationTimeout": {
+          "params": {
+            "timeout": { "type": "number", "required": true }
+          },
+          "returns": { "type": "void" }
+        }
+      },
+      "events": ["close", "load", "domcontentloaded", "popup", "request", "response"]
+    },
+    "Frame": {
+      "methods": {
+        "goto": {
+          "params": {
+            "url": { "type": "string", "required": true },
+            "timeout": { "type": "number", "required": false },
+            "waitUntil": { "type": "string", "required": false }
+          },
+          "returns": { "type": "object", "objectType": "Response", "nullable": true }
+        },
+        "waitForLoadState": {
+          "params": {
+            "state": { "type": "string", "required": false },
+            "timeout": { "type": "number", "required": false }
+          },
+          "returns": { "type": "void" }
+        },
+        "locator": {
+          "params": {
+            "selector": { "type": "string", "required": true },
+            "hasText": { "type": "string", "required": false },
+            "hasNotText": { "type": "string", "required": false }
+          },
+          "returns": { "type": "object", "objectType": "Locator" }
+        },
+        "querySelector": {
+          "params": {
+            "selector": { "type": "string", "required": true }
+          },
+          "returns": { "type": "object", "objectType": "ElementHandle", "nullable": true }
+        },
+        "querySelectorAll": {
+          "params": {
+            "selector": { "type": "string", "required": true }
+          },
+          "returns": { "type": "array", "items": { "type": "object", "objectType": "ElementHandle" } }
+        },
+        "waitForSelector": {
+          "params": {
+            "selector": { "type": "string", "required": true },
+            "state": { "type": "string", "required": false },
+            "timeout": { "type": "number", "required": false }
+          },
+          "returns": { "type": "object", "objectType": "ElementHandle", "nullable": true }
+        },
+        "click": {
+          "params": {
+            "selector": { "type": "string", "required": true },
+            "button": { "type": "string", "required": false },
+            "clickCount": { "type": "number", "required": false },
+            "delay": { "type": "number", "required": false },
+            "timeout": { "type": "number", "required": false }
+          },
+          "returns": { "type": "void" }
+        },
+        "fill": {
+          "params": {
+            "selector": { "type": "string", "required": true },
+            "value": { "type": "string", "required": true },
+            "timeout": { "type": "number", "required": false }
+          },
+          "returns": { "type": "void" }
+        },
+        "type": {
+          "params": {
+            "selector": { "type": "string", "required": true },
+            "text": { "type": "string", "required": true },
+            "delay": { "type": "number", "required": false },
+            "timeout": { "type": "number", "required": false }
+          },
+          "returns": { "type": "void" }
+        },
+        "press": {
+          "params": {
+            "selector": { "type": "string", "required": true },
+            "key": { "type": "string", "required": true },
+            "delay": { "type": "number", "required": false },
+            "timeout": { "type": "number", "required": false }
+          },
+          "returns": { "type": "void" }
+        },
+        "evaluate": {
+          "params": {
+            "expression": { "type": "string", "required": true },
+            "arg": { "type": "any", "required": false }
+          },
+          "returns": { "type": "any" }
+        },
+        "content": {
+          "params": {},
+          "returns": { "type": "string" }
+        },
+        "setContent": {
+          "params": {
+            "html": { "type": "string", "required": true },
+            "timeout": { "type": "number", "required": false },
+            "waitUntil": { "type": "string", "required": false }
+          },
+          "returns": { "type": "void" }
+        },
+        "title": {
+          "params": {},
+          "returns": { "type": "string" }
+        },
+        "url": {
+          "params": {},
+          "returns": { "type": "string" }
+        },
+        "name": {
+          "params": {},
+          "returns": { "type": "string" }
+        },
+        "isDetached": {
+          "params": {},
+          "returns": { "type": "boolean" }
+        },
+        "parentFrame": {
+          "params": {},
+          "returns": { "type": "object", "objectType": "Frame", "nullable": true }
+        },
+        "childFrames": {
+          "params": {},
+          "returns": { "type": "array", "items": { "type": "object", "objectType": "Frame" } }
+        }
+      }
+    },
+    "Locator": {
+      "methods": {
+        "click": {
+          "params": {
+            "button": { "type": "string", "required": false },
+            "clickCount": { "type": "number", "required": false },
+            "delay": { "type": "number", "required": false },
+            "timeout": { "type": "number", "required": false },
+            "force": { "type": "boolean", "required": false },
+            "noWaitAfter": { "type": "boolean", "required": false }
+          },
+          "returns": { "type": "void" }
+        },
+        "dblclick": {
+          "params": {
+            "button": { "type": "string", "required": false },
+            "delay": { "type": "number", "required": false },
+            "timeout": { "type": "number", "required": false },
+            "force": { "type": "boolean", "required": false }
+          },
+          "returns": { "type": "void" }
+        },
+        "fill": {
+          "params": {
+            "value": { "type": "string", "required": true },
+            "timeout": { "type": "number", "required": false },
+            "force": { "type": "boolean", "required": false },
+            "noWaitAfter": { "type": "boolean", "required": false }
+          },
+          "returns": { "type": "void" }
+        },
+        "type": {
+          "params": {
+            "text": { "type": "string", "required": true },
+            "delay": { "type": "number", "required": false },
+            "timeout": { "type": "number", "required": false },
+            "noWaitAfter": { "type": "boolean", "required": false }
+          },
+          "returns": { "type": "void" }
+        },
+        "press": {
+          "params": {
+            "key": { "type": "string", "required": true },
+            "delay": { "type": "number", "required": false },
+            "timeout": { "type": "number", "required": false },
+            "noWaitAfter": { "type": "boolean", "required": false }
+          },
+          "returns": { "type": "void" }
+        },
+        "textContent": {
+          "params": {
+            "timeout": { "type": "number", "required": false }
+          },
+          "returns": { "type": "string", "nullable": true }
+        },
+        "innerText": {
+          "params": {
+            "timeout": { "type": "number", "required": false }
+          },
+          "returns": { "type": "string" }
+        },
+        "innerHTML": {
+          "params": {
+            "timeout": { "type": "number", "required": false }
+          },
+          "returns": { "type": "string" }
+        },
+        "inputValue": {
+          "params": {
+            "timeout": { "type": "number", "required": false }
+          },
+          "returns": { "type": "string" }
+        },
+        "getAttribute": {
+          "params": {
+            "name": { "type": "string", "required": true },
+            "timeout": { "type": "number", "required": false }
+          },
+          "returns": { "type": "string", "nullable": true }
+        },
+        "isVisible": {
+          "params": {
+            "timeout": { "type": "number", "required": false }
+          },
+          "returns": { "type": "boolean" }
+        },
+        "isHidden": {
+          "params": {
+            "timeout": { "type": "number", "required": false }
+          },
+          "returns": { "type": "boolean" }
+        },
+        "isEnabled": {
+          "params": {
+            "timeout": { "type": "number", "required": false }
+          },
+          "returns": { "type": "boolean" }
+        },
+        "isDisabled": {
+          "params": {
+            "timeout": { "type": "number", "required": false }
+          },
+          "returns": { "type": "boolean" }
+        },
+        "isChecked": {
+          "params": {
+            "timeout": { "type": "number", "required": false }
+          },
+          "returns": { "type": "boolean" }
+        },
+        "check": {
+          "params": {
+            "timeout": { "type": "number", "required": false },
+            "force": { "type": "boolean", "required": false }
+          },
+          "returns": { "type": "void" }
+        },
+        "uncheck": {
+          "params": {
+            "timeout": { "type": "number", "required": false },
+            "force": { "type": "boolean", "required": false }
+          },
+          "returns": { "type": "void" }
+        },
+        "hover": {
+          "params": {
+            "timeout": { "type": "number", "required": false },
+            "force": { "type": "boolean", "required": false }
+          },
+          "returns": { "type": "void" }
+        },
+        "focus": {
+          "params": {
+            "timeout": { "type": "number", "required": false }
+          },
+          "returns": { "type": "void" }
+        },
+        "selectOption": {
+          "params": {
+            "values": { "type": "any", "required": true },
+            "timeout": { "type": "number", "required": false }
+          },
+          "returns": { "type": "array", "items": "string" }
+        },
+        "screenshot": {
+          "params": {
+            "path": { "type": "string", "required": false },
+            "type": { "type": "string", "required": false },
+            "quality": { "type": "number", "required": false },
+            "timeout": { "type": "number", "required": false }
+          },
+          "returns": { "type": "buffer" }
+        },
+        "boundingBox": {
+          "params": {
+            "timeout": { "type": "number", "required": false }
+          },
+          "returns": { "type": "object", "objectType": "BoundingBox", "nullable": true }
+        },
+        "count": {
+          "params": {},
+          "returns": { "type": "number" }
+        },
+        "evaluate": {
+          "params": {
+            "expression": { "type": "string", "required": true },
+            "arg": { "type": "any", "required": false }
+          },
+          "returns": { "type": "any" }
+        },
+        "scrollIntoViewIfNeeded": {
+          "params": {
+            "timeout": { "type": "number", "required": false }
+          },
+          "returns": { "type": "void" }
+        },
+        "waitFor": {
+          "params": {
+            "state": { "type": "string", "required": false },
+            "timeout": { "type": "number", "required": false }
+          },
+          "returns": { "type": "void" }
+        }
+      }
+    },
+    "ElementHandle": {
+      "methods": {
+        "click": {
+          "params": {
+            "button": { "type": "string", "required": false },
+            "clickCount": { "type": "number", "required": false },
+            "delay": { "type": "number", "required": false },
+            "timeout": { "type": "number", "required": false },
+            "force": { "type": "boolean", "required": false }
+          },
+          "returns": { "type": "void" }
+        },
+        "dblclick": {
+          "params": {
+            "button": { "type": "string", "required": false },
+            "delay": { "type": "number", "required": false },
+            "timeout": { "type": "number", "required": false }
+          },
+          "returns": { "type": "void" }
+        },
+        "fill": {
+          "params": {
+            "value": { "type": "string", "required": true },
+            "timeout": { "type": "number", "required": false }
+          },
+          "returns": { "type": "void" }
+        },
+        "type": {
+          "params": {
+            "text": { "type": "string", "required": true },
+            "delay": { "type": "number", "required": false },
+            "timeout": { "type": "number", "required": false }
+          },
+          "returns": { "type": "void" }
+        },
+        "press": {
+          "params": {
+            "key": { "type": "string", "required": true },
+            "delay": { "type": "number", "required": false },
+            "timeout": { "type": "number", "required": false }
+          },
+          "returns": { "type": "void" }
+        },
+        "textContent": {
+          "params": {},
+          "returns": { "type": "string", "nullable": true }
+        },
+        "innerText": {
+          "params": {},
+          "returns": { "type": "string" }
+        },
+        "innerHTML": {
+          "params": {},
+          "returns": { "type": "string" }
+        },
+        "getAttribute": {
+          "params": {
+            "name": { "type": "string", "required": true }
+          },
+          "returns": { "type": "string", "nullable": true }
+        },
+        "isVisible": {
+          "params": {},
+          "returns": { "type": "boolean" }
+        },
+        "isHidden": {
+          "params": {},
+          "returns": { "type": "boolean" }
+        },
+        "isEnabled": {
+          "params": {},
+          "returns": { "type": "boolean" }
+        },
+        "isDisabled": {
+          "params": {},
+          "returns": { "type": "boolean" }
+        },
+        "boundingBox": {
+          "params": {},
+          "returns": { "type": "object", "objectType": "BoundingBox", "nullable": true }
+        },
+        "screenshot": {
+          "params": {
+            "path": { "type": "string", "required": false },
+            "type": { "type": "string", "required": false },
+            "quality": { "type": "number", "required": false },
+            "timeout": { "type": "number", "required": false }
+          },
+          "returns": { "type": "buffer" }
+        },
+        "hover": {
+          "params": {
+            "timeout": { "type": "number", "required": false },
+            "force": { "type": "boolean", "required": false }
+          },
+          "returns": { "type": "void" }
+        },
+        "focus": {
+          "params": {},
+          "returns": { "type": "void" }
+        },
+        "evaluate": {
+          "params": {
+            "expression": { "type": "string", "required": true },
+            "arg": { "type": "any", "required": false }
+          },
+          "returns": { "type": "any" }
+        },
+        "querySelector": {
+          "params": {
+            "selector": { "type": "string", "required": true }
+          },
+          "returns": { "type": "object", "objectType": "ElementHandle", "nullable": true }
+        },
+        "querySelectorAll": {
+          "params": {
+            "selector": { "type": "string", "required": true }
+          },
+          "returns": { "type": "array", "items": { "type": "object", "objectType": "ElementHandle" } }
+        },
+        "dispose": {
+          "params": {},
+          "returns": { "type": "void" }
+        }
+      }
+    },
+    "Response": {
+      "methods": {
+        "status": {
+          "params": {},
+          "returns": { "type": "number" }
+        },
+        "statusText": {
+          "params": {},
+          "returns": { "type": "string" }
+        },
+        "url": {
+          "params": {},
+          "returns": { "type": "string" }
+        },
+        "ok": {
+          "params": {},
+          "returns": { "type": "boolean" }
+        },
+        "headers": {
+          "params": {},
+          "returns": { "type": "object" }
+        },
+        "body": {
+          "params": {},
+          "returns": { "type": "buffer" }
+        },
+        "text": {
+          "params": {},
+          "returns": { "type": "string" }
+        },
+        "json": {
+          "params": {},
+          "returns": { "type": "any" }
+        }
+      }
+    }
+  },
+  "sharedTypes": {
+    "ViewportSize": {
+      "properties": {
+        "width": { "type": "number", "required": true },
+        "height": { "type": "number", "required": true }
+      }
+    },
+    "BoundingBox": {
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "width": { "type": "number" },
+        "height": { "type": "number" }
+      }
+    },
+    "Cookie": {
+      "properties": {
+        "name": { "type": "string", "required": true },
+        "value": { "type": "string", "required": true },
+        "domain": { "type": "string", "required": false },
+        "path": { "type": "string", "required": false },
+        "expires": { "type": "number", "required": false },
+        "httpOnly": { "type": "boolean", "required": false },
+        "secure": { "type": "boolean", "required": false },
+        "sameSite": { "type": "string", "required": false }
+      }
+    }
+  }
+}
