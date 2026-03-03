@@ -16,7 +16,7 @@ Its API is also incomplete. It may also have memory leak issues.
 
 I don't constrain the coding style. You might see repeated code and so on.
 
-I do not provide any support for this. You can fork it and make changes.
+I do not provide any support for this project. You can fork it and make changes.
 
 ## How It Works
 
