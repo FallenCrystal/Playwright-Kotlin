@@ -35,4 +35,5 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+    dependsOn(":buildServer")
 }

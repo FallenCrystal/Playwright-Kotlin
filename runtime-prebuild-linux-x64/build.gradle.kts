@@ -38,17 +38,9 @@ val gitBash = if (org.gradle.internal.os.OperatingSystem.current().isWindows) {
 
 val buildNativeServer by tasks.registering(Exec::class) {
     description = "Build native server binary for linux-x64 using Node.js SEA"
+    dependsOn(":bundleServer")
     workingDir = serverDir
     commandLine(gitBash, "build-sea.sh", "linux-x64")
-    doFirst {
-        val bundle = serverDir.resolve("bundle/server-bundle.js")
-        if (!bundle.exists()) {
-            throw GradleException(
-                "server bundle not found at $bundle. " +
-                "Run 'cd server && npm install && npm run build && npm run build:bundle' first."
-            )
-        }
-    }
 }
 
 val copyNativeBinary by tasks.registering(Copy::class) {

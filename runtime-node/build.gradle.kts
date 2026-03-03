@@ -28,17 +28,9 @@ val serverDir = rootProject.projectDir.resolve("server")
 
 val copyServerBundle by tasks.registering(Copy::class) {
     description = "Copy server-bundle.js into JAR resources"
+    dependsOn(":bundleServer")
     from(serverDir.resolve("bundle/server-bundle.js"))
     into(layout.buildDirectory.dir("resources/main/playwright-server"))
-    doFirst {
-        val bundle = serverDir.resolve("bundle/server-bundle.js")
-        if (!bundle.exists()) {
-            throw GradleException(
-                "server bundle not found at $bundle. " +
-                "Run 'cd server && npm install && npm run build && npm run build:bundle' first."
-            )
-        }
-    }
 }
 
 tasks.named("processResources") {
