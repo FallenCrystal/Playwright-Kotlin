@@ -1,5 +1,6 @@
 import { ObjectRegistry } from '../objectRegistry';
 import { EventMessage } from '../protocolHandler';
+import { resolveEvalArg, evaluateExpression } from '../serializer';
 
 export async function LocatorHandler(
   registry: ObjectRegistry,
@@ -155,7 +156,8 @@ export async function LocatorHandler(
       return await locator.count();
     }
     case 'evaluate': {
-      return await locator.evaluate(params.expression, params.arg);
+      const arg = params.arg !== undefined ? resolveEvalArg(params.arg, registry) : undefined;
+      return await evaluateExpression(locator, params.expression, arg);
     }
     case 'scrollIntoViewIfNeeded': {
       const options: Record<string, any> = {};

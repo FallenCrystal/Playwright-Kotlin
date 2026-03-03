@@ -1,5 +1,6 @@
 import { ObjectRegistry } from '../objectRegistry';
 import { EventMessage } from '../protocolHandler';
+import { resolveEvalArg, evaluateExpression } from '../serializer';
 
 export async function PageHandler(
   registry: ObjectRegistry,
@@ -124,11 +125,13 @@ export async function PageHandler(
       return {};
     }
     case 'evaluate': {
-      const result = await page.evaluate(params.expression, params.arg);
+      const arg = params.arg !== undefined ? resolveEvalArg(params.arg, registry) : undefined;
+      const result = await evaluateExpression(page, params.expression, arg);
       return result === undefined ? null : result;
     }
     case 'evaluateHandle': {
-      const handle = await page.evaluateHandle(params.expression, params.arg);
+      const arg = params.arg !== undefined ? resolveEvalArg(params.arg, registry) : undefined;
+      const handle = await page.evaluateHandle(params.expression, arg);
       const result = await handle.jsonValue();
       return result;
     }

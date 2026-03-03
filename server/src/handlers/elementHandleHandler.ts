@@ -1,5 +1,6 @@
 import { ObjectRegistry } from '../objectRegistry';
 import { EventMessage } from '../protocolHandler';
+import { resolveEvalArg, evaluateExpression } from '../serializer';
 
 export async function ElementHandleHandler(
   registry: ObjectRegistry,
@@ -97,7 +98,8 @@ export async function ElementHandleHandler(
       return {};
     }
     case 'evaluate': {
-      return await element.evaluate(params.expression, params.arg);
+      const arg = params.arg !== undefined ? resolveEvalArg(params.arg, registry) : undefined;
+      return await evaluateExpression(element, params.expression, arg);
     }
     case 'querySelector': {
       const child = await element.$(params.selector);

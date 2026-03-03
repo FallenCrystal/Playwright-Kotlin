@@ -112,11 +112,15 @@ class ElementHandle(
         sendMessage("focus")
     }
 
-    suspend fun evaluate(expression: String, arg: JsonElement? = null): JsonElement? {
-        return sendMessage("evaluate") {
+    suspend fun evaluate(expression: String, vararg args: Any?): Any? {
+        val result = sendMessage("evaluate") {
             put("expression", expression)
-            arg?.let { put("arg", it) }
+            if (args.isNotEmpty()) {
+                val serialized = if (args.size == 1) serializeEvalArg(args[0]) else serializeEvalArg(args.toList())
+                put("arg", serialized)
+            }
         }
+        return deserializeEvalResult(result)
     }
 
     suspend fun querySelector(selector: String): ElementHandle? {

@@ -1,5 +1,6 @@
 import { ObjectRegistry } from '../objectRegistry';
 import { EventMessage } from '../protocolHandler';
+import { resolveEvalArg, evaluateExpression } from '../serializer';
 
 export async function FrameHandler(
   registry: ObjectRegistry,
@@ -88,7 +89,8 @@ export async function FrameHandler(
       return {};
     }
     case 'evaluate': {
-      const result = await frame.evaluate(params.expression, params.arg);
+      const arg = params.arg !== undefined ? resolveEvalArg(params.arg, registry) : undefined;
+      const result = await evaluateExpression(frame, params.expression, arg);
       return result;
     }
     case 'content': {
