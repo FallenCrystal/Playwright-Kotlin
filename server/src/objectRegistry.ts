@@ -42,11 +42,12 @@ export class ObjectRegistry {
 
   async closeAll(): Promise<void> {
     for (const [guid, obj] of this.objects.entries()) {
-      if (this.types.get(guid) === 'Browser') {
+      const type = this.types.get(guid);
+      if (type === 'Browser' || type === 'BrowserContext') {
         try {
           await obj.close();
         } catch (e) {
-          // Browser may already be closed
+          // Browser/context may already be closed
         }
       }
     }

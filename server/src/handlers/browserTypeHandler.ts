@@ -18,6 +18,7 @@ export async function BrowserTypeHandler(
       if (params.channel) options.channel = params.channel;
       if (params.executablePath) options.executablePath = params.executablePath;
       if (params.args) options.args = params.args;
+      if (params.ignoreDefaultArgs !== undefined) options.ignoreDefaultArgs = params.ignoreDefaultArgs;
       if (params.timeout !== undefined) options.timeout = params.timeout;
       if (params.slowMo !== undefined) options.slowMo = params.slowMo;
 
@@ -41,6 +42,7 @@ export async function BrowserTypeHandler(
       if (params.channel) options.channel = params.channel;
       if (params.executablePath) options.executablePath = params.executablePath;
       if (params.args) options.args = params.args;
+      if (params.ignoreDefaultArgs !== undefined) options.ignoreDefaultArgs = params.ignoreDefaultArgs;
       if (params.timeout !== undefined) options.timeout = params.timeout;
       if (params.slowMo !== undefined) options.slowMo = params.slowMo;
       if (params.viewport !== undefined) options.viewport = params.viewport;

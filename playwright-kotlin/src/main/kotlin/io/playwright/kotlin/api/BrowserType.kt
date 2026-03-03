@@ -19,6 +19,7 @@ class BrowserType(
             options.channel?.let { put("channel", it) }
             options.executablePath?.let { put("executablePath", it) }
             options.args?.let { put("args", JsonArray(it.map { a -> JsonPrimitive(a) })) }
+            options.ignoreDefaultArgs?.let { put("ignoreDefaultArgs", JsonArray(it.map { a -> JsonPrimitive(a) })) }
             options.timeout?.let { put("timeout", it) }
             options.slowMo?.let { put("slowMo", it) }
         }
@@ -36,6 +37,7 @@ class BrowserType(
             options.channel?.let { put("channel", it) }
             options.executablePath?.let { put("executablePath", it) }
             options.args?.let { put("args", JsonArray(it.map { a -> JsonPrimitive(a) })) }
+            options.ignoreDefaultArgs?.let { put("ignoreDefaultArgs", JsonArray(it.map { a -> JsonPrimitive(a) })) }
             options.timeout?.let { put("timeout", it) }
             options.slowMo?.let { put("slowMo", it) }
             options.viewport?.let {

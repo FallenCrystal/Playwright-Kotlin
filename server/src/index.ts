@@ -22,6 +22,22 @@ if (args.includes('--install-browsers')) {
 
   const server = createServer(port, { standalone });
 
+  // When the parent process (JVM) is killed, the stdin pipe breaks.
+  // Detect this and exit so we don't leave an orphan Node.js process.
+  if (!standalone) {
+    process.stdin.resume();
+    process.stdin.on('end', () => {
+      console.log('[server] Parent process exited (stdin closed), shutting down...');
+      server.close();
+      process.exit(0);
+    });
+    process.stdin.on('error', () => {
+      console.log('[server] Parent process exited (stdin error), shutting down...');
+      server.close();
+      process.exit(0);
+    });
+  }
+
   process.on('SIGINT', () => {
     console.log('[server] Shutting down...');
     server.close();

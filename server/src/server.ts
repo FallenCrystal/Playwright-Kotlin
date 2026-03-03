@@ -15,6 +15,34 @@ export function createServer(port: number, options?: ServerOptions): net.Server 
     console.log(`[server] Client connected from ${socket.remoteAddress}:${socket.remotePort}`);
     connections.add(socket);
 
+    // Enable TCP keepalive with a short interval so the OS detects dead
+    // connections quickly (e.g. when the JVM is force-killed on Windows and
+    // no FIN/RST is sent).  After 5 s idle the first probe is sent; the OS
+    // default retry interval (1 s on Windows, 75 s on Linux) and retry count
+    // (10 on Windows, 9 on Linux) then determine the total detection time.
+    socket.setKeepAlive(true, 5_000);
+
+    // Application-level liveness probe: periodically write an empty line (\n)
+    // to the socket.  Both sides already skip empty NDJSON lines, so this is
+    // invisible to the protocol.  If the peer (JVM) is dead, the write will
+    // fail and we destroy the socket, which triggers the 'close' handler that
+    // cleans up browsers and exits.
+    const heartbeat = setInterval(() => {
+      if (socket.destroyed || !socket.writable) {
+        clearInterval(heartbeat);
+        socket.destroy();
+        return;
+      }
+      socket.write('\n', (err) => {
+        if (err) {
+          console.log('[server] Heartbeat write failed, destroying socket:', err.message);
+          clearInterval(heartbeat);
+          socket.destroy();
+        }
+      });
+    }, 3_000);
+    heartbeat.unref();
+
     const registry = new ObjectRegistry();
     let buffer = '';
 
@@ -61,10 +89,21 @@ export function createServer(port: number, options?: ServerOptions): net.Server 
 
     socket.on('close', () => {
       console.log('[server] Client disconnected');
+      clearInterval(heartbeat);
       connections.delete(socket);
+
+      // Force-exit safety net: if closeAll() hangs (e.g. browser unresponsive),
+      // don't keep the server alive forever.
+      const forceExitTimer = setTimeout(() => {
+        console.log('[server] Force-exiting after cleanup timeout');
+        process.exit(1);
+      }, 10_000);
+      forceExitTimer.unref();
+
       registry.closeAll().catch((e) => {
         console.error('[server] Error closing browsers:', e);
       }).finally(() => {
+        clearTimeout(forceExitTimer);
         if (!standalone && connections.size === 0) {
           console.log('[server] Last client disconnected, shutting down');
           server.close();

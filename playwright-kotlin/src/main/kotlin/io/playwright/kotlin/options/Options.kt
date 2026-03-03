@@ -7,6 +7,7 @@ data class LaunchOptions(
     val channel: String? = null,
     val executablePath: String? = null,
     val args: List<String>? = null,
+    val ignoreDefaultArgs: List<String>? = null,
     val timeout: Double? = null,
     val slowMo: Double? = null
 )
@@ -77,6 +78,7 @@ data class LaunchPersistentContextOptions(
     val channel: String? = null,
     val executablePath: String? = null,
     val args: List<String>? = null,
+    val ignoreDefaultArgs: List<String>? = null,
     val timeout: Double? = null,
     val slowMo: Double? = null,
     val viewport: ViewportSize? = null,
