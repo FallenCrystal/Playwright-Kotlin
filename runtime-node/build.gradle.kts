@@ -1,3 +1,6 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 val jvmTarget: String by project
 
 plugins {
@@ -6,9 +9,12 @@ plugins {
 }
 
 java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(jvmTarget))
-    }
+    sourceCompatibility = JavaVersion.toVersion(jvmTarget)
+    targetCompatibility = JavaVersion.toVersion(jvmTarget)
+}
+
+tasks.withType<KotlinJvmCompile>().configureEach {
+    compilerOptions.jvmTarget.set(JvmTarget.fromTarget(jvmTarget))
 }
 
 mavenPublishing {
