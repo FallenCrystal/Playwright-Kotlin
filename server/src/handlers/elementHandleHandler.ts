@@ -20,6 +20,7 @@ export async function ElementHandleHandler(
       if (params.delay !== undefined) options.delay = params.delay;
       if (params.timeout !== undefined) options.timeout = params.timeout;
       if (params.force !== undefined) options.force = params.force;
+      if (params.noWaitAfter !== undefined) options.noWaitAfter = params.noWaitAfter;
       await element.click(options);
       return {};
     }

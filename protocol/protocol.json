@@ -28,6 +28,7 @@
             "channel": { "type": "string", "required": false },
             "executablePath": { "type": "string", "required": false },
             "args": { "type": "array", "items": "string", "required": false },
+            "ignoreDefaultArgs": { "type": "array", "items": "string", "required": false },
             "timeout": { "type": "number", "required": false },
             "slowMo": { "type": "number", "required": false }
           },
@@ -59,7 +60,11 @@
             "viewport": { "type": "object", "objectType": "ViewportSize", "required": false },
             "userAgent": { "type": "string", "required": false },
             "locale": { "type": "string", "required": false },
-            "ignoreHTTPSErrors": { "type": "boolean", "required": false }
+            "ignoreHTTPSErrors": { "type": "boolean", "required": false },
+            "timezoneId": { "type": "string", "required": false },
+            "javaScriptEnabled": { "type": "boolean", "required": false },
+            "bypassCSP": { "type": "boolean", "required": false },
+            "deviceScaleFactor": { "type": "number", "required": false }
           },
           "returns": { "type": "object", "objectType": "Page" }
         },
@@ -199,7 +204,9 @@
             "button": { "type": "string", "required": false },
             "clickCount": { "type": "number", "required": false },
             "delay": { "type": "number", "required": false },
-            "timeout": { "type": "number", "required": false }
+            "timeout": { "type": "number", "required": false },
+            "force": { "type": "boolean", "required": false },
+            "noWaitAfter": { "type": "boolean", "required": false }
           },
           "returns": { "type": "void" }
         },
@@ -388,7 +395,9 @@
             "button": { "type": "string", "required": false },
             "clickCount": { "type": "number", "required": false },
             "delay": { "type": "number", "required": false },
-            "timeout": { "type": "number", "required": false }
+            "timeout": { "type": "number", "required": false },
+            "force": { "type": "boolean", "required": false },
+            "noWaitAfter": { "type": "boolean", "required": false }
           },
           "returns": { "type": "void" }
         },
@@ -656,7 +665,8 @@
             "clickCount": { "type": "number", "required": false },
             "delay": { "type": "number", "required": false },
             "timeout": { "type": "number", "required": false },
-            "force": { "type": "boolean", "required": false }
+            "force": { "type": "boolean", "required": false },
+            "noWaitAfter": { "type": "boolean", "required": false }
           },
           "returns": { "type": "void" }
         },

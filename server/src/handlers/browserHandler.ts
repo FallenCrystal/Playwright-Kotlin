@@ -43,6 +43,10 @@ export async function BrowserHandler(
       if (params.userAgent) options.userAgent = params.userAgent;
       if (params.locale) options.locale = params.locale;
       if (params.ignoreHTTPSErrors !== undefined) options.ignoreHTTPSErrors = params.ignoreHTTPSErrors;
+      if (params.timezoneId) options.timezoneId = params.timezoneId;
+      if (params.javaScriptEnabled !== undefined) options.javaScriptEnabled = params.javaScriptEnabled;
+      if (params.bypassCSP !== undefined) options.bypassCSP = params.bypassCSP;
+      if (params.deviceScaleFactor !== undefined) options.deviceScaleFactor = params.deviceScaleFactor;
 
       // newPage creates context + page
       const context = await browser.newContext(options);

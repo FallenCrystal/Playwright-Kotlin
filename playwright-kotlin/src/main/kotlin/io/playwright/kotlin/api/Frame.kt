@@ -73,6 +73,8 @@ class Frame(
             options.clickCount?.let { put("clickCount", it) }
             options.delay?.let { put("delay", it) }
             options.timeout?.let { put("timeout", it) }
+            options.force?.let { put("force", it) }
+            options.noWaitAfter?.let { put("noWaitAfter", it) }
         }
     }
 

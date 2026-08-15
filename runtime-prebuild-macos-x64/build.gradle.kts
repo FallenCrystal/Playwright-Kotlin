@@ -47,6 +47,9 @@ val buildNativeServer by tasks.registering(Exec::class) {
     dependsOn(":bundleServer")
     workingDir = serverDir
     commandLine(gitBash, "build-sea.sh", "macos-x64")
+    inputs.file(serverDir.resolve("bundle/server-bundle.js"))
+    inputs.file(serverDir.resolve("build-sea.sh"))
+    outputs.file(serverDir.resolve("build/playwright-server-macos-x64"))
 }
 
 val copyNativeBinary by tasks.registering(Copy::class) {

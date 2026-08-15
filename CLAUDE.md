@@ -14,7 +14,7 @@ Playwright-Kotlin is a Kotlin/JVM client for Playwright browser automation. It c
 
 ### Server (TypeScript)
 ```bash
-cd server && npm install        # install dependencies
+cd server && npm ci             # install locked dependencies
 cd server && npm run build      # compile TS → dist/ (required before Kotlin tests)
 ```
 
@@ -26,7 +26,11 @@ cd server && npm run build      # compile TS → dist/ (required before Kotlin t
 
 ### Full build from scratch
 ```bash
-cd server && npm install && npm run build && cd .. && ./gradlew :playwright-kotlin:test
+cd server && npm ci && npm run build && cd .. && ./gradlew :playwright-kotlin:test
+
+# The integration tests use an installed Chrome automatically. Override when
+# needed (for example in CI):
+PLAYWRIGHT_KOTLIN_TEST_BROWSER_CHANNEL=chrome ./gradlew :playwright-kotlin:test
 ```
 
 ## Architecture
@@ -65,5 +69,5 @@ Kotlin suspend fn → Connection.sendMessage(id, guid, method, params)
 Both sides maintain a GUID → object mapping. When the server creates a new Playwright object (e.g., launching a browser returns a Browser), it registers it with a GUID and returns `{guid, type}`. The Kotlin client creates a corresponding ChannelOwner subclass and registers it locally. All subsequent calls reference objects by GUID.
 
 ## Dependencies (from gradle.properties)
-- Kotlin 2.1.0, kotlinx-coroutines 1.9.0, kotlinx-serialization 1.7.3, Netty 4.1.115.Final
-- Server: playwright 1.49.x, TypeScript 5.x
+- Kotlin 2.3.0, kotlinx-coroutines 1.9.0, kotlinx-serialization 1.7.3, Netty 4.1.137.Final
+- Server: Playwright 1.58.2, TypeScript 5.x

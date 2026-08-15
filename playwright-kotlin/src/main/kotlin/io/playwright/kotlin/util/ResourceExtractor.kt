@@ -5,6 +5,8 @@ import java.io.InputStream
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption
+import java.nio.file.AtomicMoveNotSupportedException
+import java.nio.file.FileAlreadyExistsException
 import java.security.MessageDigest
 
 /**
@@ -28,7 +30,8 @@ object ResourceExtractor {
         // Compute SHA-256 hash of the resource for cache key
         val hash = computeHash(inputStream)
         // Re-open the stream since computeHash consumed it
-        val resourceStream = classLoader.getResourceAsStream(resourcePath)!!
+        val resourceStream = classLoader.getResourceAsStream(resourcePath)
+            ?: throw IllegalStateException("Resource disappeared from classpath: $resourcePath")
 
         val fileName = resourcePath.substringAfterLast("/")
         val cacheDir = getCacheDir().resolve(hash)
@@ -41,8 +44,29 @@ object ResourceExtractor {
 
         // Extract to cache directory
         Files.createDirectories(cacheDir)
-        resourceStream.use { stream ->
-            Files.copy(stream, targetFile, StandardCopyOption.REPLACE_EXISTING)
+        val temporaryFile = Files.createTempFile(cacheDir, ".$fileName-", ".tmp")
+        try {
+            resourceStream.use { stream ->
+                Files.copy(stream, temporaryFile, StandardCopyOption.REPLACE_EXISTING)
+            }
+
+            // Write to a temporary file and publish it atomically. Without
+            // this, another JVM can observe a partially extracted executable
+            // while the first process is still copying the classpath resource.
+            try {
+                Files.move(
+                    temporaryFile,
+                    targetFile,
+                    StandardCopyOption.ATOMIC_MOVE,
+                    StandardCopyOption.REPLACE_EXISTING
+                )
+            } catch (_: AtomicMoveNotSupportedException) {
+                Files.move(temporaryFile, targetFile, StandardCopyOption.REPLACE_EXISTING)
+            } catch (_: FileAlreadyExistsException) {
+                Files.move(temporaryFile, targetFile, StandardCopyOption.REPLACE_EXISTING)
+            }
+        } finally {
+            Files.deleteIfExists(temporaryFile)
         }
 
         // Set executable permission on non-Windows

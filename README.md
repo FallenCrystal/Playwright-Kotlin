@@ -32,7 +32,8 @@ The Kotlin side sends JSON requests to a TypeScript Server over TCP. The Server 
 
 - JDK 21+
 - Node.js 18+, npm
-- Playwright browsers (at least one installed)
+- A Playwright-managed browser or a locally installed Chrome (the integration
+  tests automatically use Chrome when it is available)
 
 ## Quick Start
 
@@ -40,9 +41,10 @@ The Kotlin side sends JSON requests to a TypeScript Server over TCP. The Server 
 
 ```bash
 cd server
-npm install
+npm ci
 npm run build
-npx playwright install chromium   # Install Chromium browser
+# Optional when no system Chrome is available:
+npx playwright install chromium
 ```
 
 ### 2. Build the Kotlin Client
@@ -191,17 +193,21 @@ Make sure the Server is built first, then run:
 ./gradlew :playwright-kotlin:test
 ```
 
-Tests automatically start a Server subprocess, connect to Chromium, perform page operations, and verify results.
+Tests automatically start a Server subprocess and perform page operations. If
+Google Chrome is installed, it is used through Playwright's `chrome` channel;
+otherwise Playwright's managed Chromium is used. The browser can be selected
+explicitly with `PLAYWRIGHT_KOTLIN_TEST_BROWSER_CHANNEL` or
+`PLAYWRIGHT_KOTLIN_TEST_BROWSER_EXECUTABLE`.
 
 ## Tech Stack
 
 | Component | Version |
 |---|---|
-| Kotlin | 2.1.0 |
+| Kotlin | 2.3.0 |
 | kotlinx-coroutines | 1.9.0 |
 | kotlinx-serialization | 1.7.3 |
-| Netty | 4.1.115.Final |
-| Playwright (npm) | ^1.49.0 |
+| Netty | 4.1.137.Final |
+| Playwright (npm) | 1.58.2 |
 | TypeScript | ^5.7.0 |
 | JVM Target | 21 |
 

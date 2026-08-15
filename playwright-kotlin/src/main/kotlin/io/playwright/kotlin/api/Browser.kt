@@ -42,6 +42,10 @@ class Browser(
             options.userAgent?.let { put("userAgent", it) }
             options.locale?.let { put("locale", it) }
             options.ignoreHTTPSErrors?.let { put("ignoreHTTPSErrors", it) }
+            options.timezoneId?.let { put("timezoneId", it) }
+            options.javaScriptEnabled?.let { put("javaScriptEnabled", it) }
+            options.bypassCSP?.let { put("bypassCSP", it) }
+            options.deviceScaleFactor?.let { put("deviceScaleFactor", it) }
         }
         val pageGuid = extractGuid(result)!!
         val frameGuid = result?.jsonObject?.get("frameGuid")?.jsonPrimitive?.content

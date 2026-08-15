@@ -93,6 +93,8 @@ export async function PageHandler(
       if (params.clickCount !== undefined) options.clickCount = params.clickCount;
       if (params.delay !== undefined) options.delay = params.delay;
       if (params.timeout !== undefined) options.timeout = params.timeout;
+      if (params.force !== undefined) options.force = params.force;
+      if (params.noWaitAfter !== undefined) options.noWaitAfter = params.noWaitAfter;
       await page.click(params.selector, options);
       return {};
     }
@@ -132,8 +134,13 @@ export async function PageHandler(
     case 'evaluateHandle': {
       const arg = params.arg !== undefined ? resolveEvalArg(params.arg, registry) : undefined;
       const handle = await page.evaluateHandle(params.expression, arg);
-      const result = await handle.jsonValue();
-      return result;
+      try {
+        return await handle.jsonValue();
+      } finally {
+        // The Kotlin API exposes the JSON value rather than a remote handle,
+        // so dispose the temporary JSHandle immediately after serialization.
+        await handle.dispose();
+      }
     }
     case 'screenshot': {
       const options: Record<string, any> = {};

@@ -8,12 +8,15 @@ import io.playwright.kotlin.util.ServerProcess
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import java.nio.file.Paths
+import java.util.concurrent.atomic.AtomicBoolean
 
 class Playwright private constructor(
     private val connection: Connection,
     private val serverProcess: ServerProcess?,
     private val transport: Transport
 ) {
+    private val closed = AtomicBoolean(false)
+
     lateinit var chromium: BrowserType
         private set
     lateinit var firefox: BrowserType
@@ -35,6 +38,7 @@ class Playwright private constructor(
     }
 
     suspend fun close() {
+        if (!closed.compareAndSet(false, true)) return
         try {
             connection.sendMessage("playwright", "close")
         } catch (_: Exception) {
@@ -100,15 +104,24 @@ class Playwright private constructor(
             // Late-init: transport needs to forward messages to connection,
             // but connection needs the transport reference.
             lateinit var connection: Connection
-            val transport = Transport(host, port) { message ->
-                connection.handleMessage(message)
-            }
+            val transport = Transport(
+                host,
+                port,
+                { message -> connection.handleMessage(message) }
+            ) { failure -> connection.handleTransportFailure(failure) }
             connection = Connection(transport)
-            connection.connect()
-
-            val playwright = Playwright(connection, serverProcess, transport)
-            playwright.initialize()
-            return playwright
+            try {
+                connection.connect()
+                val playwright = Playwright(connection, serverProcess, transport)
+                playwright.initialize()
+                return playwright
+            } catch (error: Throwable) {
+                // A failed TCP connection or initialization must not leave the
+                // spawned Node/native server and Netty event loop behind.
+                connection.close()
+                serverProcess?.stop()
+                throw error
+            }
         }
 
         private fun findServerPath(): String {

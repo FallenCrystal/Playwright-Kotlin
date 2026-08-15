@@ -11,14 +11,19 @@ class WaitHelper(
     suspend fun waitForEvent(eventType: String, timeout: Long = 30_000): JsonObject? {
         val deferred = CompletableDeferred<JsonObject?>()
 
-        connection.addEventListener(guid) { type, data ->
+        val listener: (String, JsonObject?) -> Unit = { type, data ->
             if (type == eventType) {
                 deferred.complete(data)
             }
         }
+        connection.addEventListener(guid, listener)
 
-        return withTimeout(timeout) {
-            deferred.await()
+        return try {
+            withTimeout(timeout) {
+                deferred.await()
+            }
+        } finally {
+            connection.removeEventListener(guid, listener)
         }
     }
 }

@@ -1,7 +1,14 @@
 package io.playwright.kotlin
 
+import com.sun.net.httpserver.HttpServer
+import io.playwright.kotlin.options.BrowserContextOptions
 import io.playwright.kotlin.options.LaunchOptions
+import io.playwright.kotlin.types.ViewportSize
 import kotlinx.coroutines.test.runTest
+import java.io.File
+import java.net.InetSocketAddress
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -9,6 +16,19 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class PlaywrightIntegrationTest {
+
+    private val testPage = """
+        <!doctype html>
+        <html>
+          <head><title>Example Domain</title></head>
+          <body>
+            <div>
+              <h1>Example Domain</h1>
+              <p>Local integration test page.</p>
+            </div>
+          </body>
+        </html>
+    """.trimIndent()
 
     private fun serverDistPath(): String {
         val path = java.io.File("server/dist/index.js")
@@ -21,43 +41,105 @@ class PlaywrightIntegrationTest {
         return path.absolutePath
     }
 
+    private fun browserLaunchOptions(): LaunchOptions {
+        val executablePath = sequenceOf(
+            System.getProperty("playwright.kotlin.test.browserExecutable"),
+            System.getenv("PLAYWRIGHT_KOTLIN_TEST_BROWSER_EXECUTABLE"),
+            System.getenv("CHROME_PATH")
+        ).firstOrNull { !it.isNullOrBlank() }
+
+        val requestedChannel = sequenceOf(
+            System.getProperty("playwright.kotlin.test.browserChannel"),
+            System.getenv("PLAYWRIGHT_KOTLIN_TEST_BROWSER_CHANNEL")
+        ).firstOrNull { !it.isNullOrBlank() }
+
+        // Prefer a locally installed Chrome when present. If it is not
+        // available, leave the channel unset so Playwright uses its managed
+        // Chromium installation as usual.
+        val channel = requestedChannel ?: if (executablePath == null && systemChromeInstalled()) {
+            "chrome"
+        } else {
+            null
+        }
+
+        return LaunchOptions(
+            headless = true,
+            channel = channel,
+            executablePath = executablePath
+        )
+    }
+
+    private fun systemChromeInstalled(): Boolean {
+        val candidates = buildList {
+            add("/usr/bin/google-chrome")
+            add("/usr/bin/google-chrome-stable")
+            add("/usr/local/bin/google-chrome")
+            add("/opt/homebrew/bin/google-chrome")
+            add("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome")
+            System.getenv("PROGRAMFILES")?.let {
+                add("$it\\Google\\Chrome\\Application\\chrome.exe")
+            }
+            System.getenv("PROGRAMFILES(X86)")?.let {
+                add("$it\\Google\\Chrome\\Application\\chrome.exe")
+            }
+            System.getenv("LOCALAPPDATA")?.let {
+                add("$it\\Google\\Chrome\\Application\\chrome.exe")
+            }
+        }
+        return candidates.any { File(it).isFile && File(it).canExecute() }
+    }
+
     @Test
     fun testFullLifecycle() = runTest(timeout = kotlin.time.Duration.parse("60s")) {
-        val pw = Playwright.create(PlaywrightConfig(serverPath = serverDistPath()))
+        val httpServer = LocalHttpServer.start(testPage)
         try {
-            // Launch browser
-            val browser = pw.chromium.launch(LaunchOptions(headless = true))
+            val pw = Playwright.create(PlaywrightConfig(serverPath = serverDistPath()))
+            try {
+                // Launch browser
+                val browser = pw.chromium.launch(browserLaunchOptions())
 
-            // Create page
-            val page = browser.newPage()
+                // Create page
+                val page = browser.newPage(
+                    BrowserContextOptions(
+                        viewport = ViewportSize(640, 480),
+                        timezoneId = "UTC",
+                        deviceScaleFactor = 2.0
+                    )
+                )
+                assertEquals(ViewportSize(640, 480), page.viewportSize())
+                assertEquals(2, page.evaluate("window.devicePixelRatio"))
+                assertEquals("UTC", page.evaluate("Intl.DateTimeFormat().resolvedOptions().timeZone"))
 
-            // Navigate
-            val response = page.goto("https://example.com")
-            assertNotNull(response)
-            assertEquals(200, response.status())
-            assertTrue(response.ok())
+                // Navigate
+                val response = page.goto(httpServer.url)
+                assertNotNull(response)
+                assertEquals(200, response.status())
+                assertTrue(response.ok())
 
-            // Check title
-            val title = page.title()
-            assertEquals("Example Domain", title)
+                // Check title
+                val title = page.title()
+                assertEquals("Example Domain", title)
 
-            // Check URL
-            val url = page.url()
-            assertTrue(url.contains("example.com"))
+                // Check URL
+                val url = page.url()
+                assertTrue(url.startsWith("http://127.0.0.1:"))
 
-            // Screenshot
-            val screenshot = page.screenshot()
-            assertTrue(screenshot.isNotEmpty())
+                // Screenshot
+                val screenshot = page.screenshot()
+                assertTrue(screenshot.isNotEmpty())
 
-            // Locator test
-            val h1 = page.locator("h1")
-            val text = h1.textContent()
-            assertEquals("Example Domain", text)
+                // Locator test
+                val h1 = page.locator("h1")
+                val text = h1.textContent()
+                assertEquals("Example Domain", text)
 
-            // Close
-            browser.close()
+                // Close
+                browser.close()
+            } finally {
+                pw.close()
+            }
         } finally {
-            pw.close()
+            httpServer.close()
         }
     }
 
@@ -65,9 +147,9 @@ class PlaywrightIntegrationTest {
     fun testLocatorOperations() = runTest(timeout = kotlin.time.Duration.parse("60s")) {
         val pw = Playwright.create(PlaywrightConfig(serverPath = serverDistPath()))
         try {
-            val browser = pw.chromium.launch(LaunchOptions(headless = true))
+            val browser = pw.chromium.launch(browserLaunchOptions())
             val page = browser.newPage()
-            page.goto("https://example.com")
+            page.setContent(testPage)
 
             // Test various locator methods
             val h1 = page.locator("h1")
@@ -92,9 +174,9 @@ class PlaywrightIntegrationTest {
     fun testEvaluate() = runTest(timeout = kotlin.time.Duration.parse("60s")) {
         val pw = Playwright.create(PlaywrightConfig(serverPath = serverDistPath()))
         try {
-            val browser = pw.chromium.launch(LaunchOptions(headless = true))
+            val browser = pw.chromium.launch(browserLaunchOptions())
             val page = browser.newPage()
-            page.goto("https://example.com")
+            page.setContent(testPage)
 
             // Evaluate JavaScript
             val result = page.evaluate("document.title")
@@ -111,9 +193,9 @@ class PlaywrightIntegrationTest {
     fun testEvaluateReturnTypes() = runTest(timeout = kotlin.time.Duration.parse("60s")) {
         val pw = Playwright.create(PlaywrightConfig(serverPath = serverDistPath()))
         try {
-            val browser = pw.chromium.launch(LaunchOptions(headless = true))
+            val browser = pw.chromium.launch(browserLaunchOptions())
             val page = browser.newPage()
-            page.goto("https://example.com")
+            page.setContent(testPage)
 
             // String - bare expression
             val title = page.evaluate("document.title")
@@ -173,7 +255,7 @@ class PlaywrightIntegrationTest {
     fun testEvaluateWithArgs() = runTest(timeout = kotlin.time.Duration.parse("60s")) {
         val pw = Playwright.create(PlaywrightConfig(serverPath = serverDistPath()))
         try {
-            val browser = pw.chromium.launch(LaunchOptions(headless = true))
+            val browser = pw.chromium.launch(browserLaunchOptions())
             val page = browser.newPage()
             page.setContent("<div id='target'>hello</div>")
 
@@ -184,6 +266,10 @@ class PlaywrightIntegrationTest {
             // Single string arg
             val upper = page.evaluate("(s) => s.toUpperCase()", "hello")
             assertEquals("HELLO", upper)
+
+            // Async arrow function without parenthesized arguments
+            val asyncDoubled = page.evaluate("async x => x * 2", 21)
+            assertEquals(42, asyncDoubled)
 
             // Single boolean arg
             val negated = page.evaluate("(b) => !b", true)
@@ -211,7 +297,7 @@ class PlaywrightIntegrationTest {
     fun testEvaluateWithElementHandle() = runTest(timeout = kotlin.time.Duration.parse("60s")) {
         val pw = Playwright.create(PlaywrightConfig(serverPath = serverDistPath()))
         try {
-            val browser = pw.chromium.launch(LaunchOptions(headless = true))
+            val browser = pw.chromium.launch(browserLaunchOptions())
             val page = browser.newPage()
             page.setContent("""
                 <div id="container">
@@ -243,6 +329,37 @@ class PlaywrightIntegrationTest {
             browser.close()
         } finally {
             pw.close()
+        }
+    }
+
+    private class LocalHttpServer private constructor(
+        private val server: HttpServer,
+        private val executor: ExecutorService
+    ) : AutoCloseable {
+        val url: String
+            get() = "http://127.0.0.1:${server.address.port}/"
+
+        override fun close() {
+            server.stop(0)
+            executor.shutdownNow()
+        }
+
+        companion object {
+            fun start(html: String): LocalHttpServer {
+                val server = HttpServer.create(InetSocketAddress("127.0.0.1", 0), 0)
+                val executor = Executors.newSingleThreadExecutor { runnable ->
+                    Thread(runnable, "playwright-test-http").apply { isDaemon = true }
+                }
+                val body = html.toByteArray(Charsets.UTF_8)
+                server.executor = executor
+                server.createContext("/") { exchange ->
+                    exchange.responseHeaders.set("Content-Type", "text/html; charset=utf-8")
+                    exchange.sendResponseHeaders(200, body.size.toLong())
+                    exchange.responseBody.use { it.write(body) }
+                }
+                server.start()
+                return LocalHttpServer(server, executor)
+            }
         }
     }
 }

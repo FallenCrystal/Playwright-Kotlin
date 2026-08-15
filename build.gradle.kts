@@ -1,6 +1,6 @@
 plugins {
-    kotlin("jvm") version "2.1.10" apply false
-    kotlin("plugin.serialization") version "2.1.10" apply false
+    kotlin("jvm") version "2.3.0" apply false
+    kotlin("plugin.serialization") version "2.3.0" apply false
     id("com.vanniktech.maven.publish.base") version "0.34.0" apply false
 }
 
@@ -21,7 +21,7 @@ val npm = if (org.gradle.internal.os.OperatingSystem.current().isWindows) "npm.c
 val npmInstall by tasks.registering(Exec::class) {
     description = "Install server npm dependencies"
     workingDir = serverDir
-    commandLine(npm, "install")
+    commandLine(npm, "ci", "--no-audit", "--no-fund")
     inputs.file(serverDir.resolve("package.json"))
     inputs.file(serverDir.resolve("package-lock.json"))
     outputs.dir(serverDir.resolve("node_modules"))
@@ -34,7 +34,11 @@ val buildServer by tasks.registering(Exec::class) {
     commandLine(npm, "run", "build")
     inputs.dir(serverDir.resolve("src"))
     inputs.file(serverDir.resolve("tsconfig.json"))
+    inputs.file(serverDir.resolve("package-lock.json"))
     outputs.dir(serverDir.resolve("dist"))
+    doFirst {
+        delete(serverDir.resolve("dist"))
+    }
 }
 
 val bundleServer by tasks.registering(Exec::class) {
@@ -44,5 +48,6 @@ val bundleServer by tasks.registering(Exec::class) {
     commandLine(npm, "run", "build:bundle")
     inputs.dir(serverDir.resolve("dist"))
     inputs.file(serverDir.resolve("esbuild.config.mjs"))
+    inputs.file(serverDir.resolve("package-lock.json"))
     outputs.file(serverDir.resolve("bundle/server-bundle.js"))
 }

@@ -65,6 +65,8 @@ export async function FrameHandler(
       if (params.clickCount !== undefined) options.clickCount = params.clickCount;
       if (params.delay !== undefined) options.delay = params.delay;
       if (params.timeout !== undefined) options.timeout = params.timeout;
+      if (params.force !== undefined) options.force = params.force;
+      if (params.noWaitAfter !== undefined) options.noWaitAfter = params.noWaitAfter;
       await frame.click(params.selector, options);
       return {};
     }

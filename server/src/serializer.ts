@@ -64,9 +64,8 @@ export function resolveEvalArg(value: any, registry: ObjectRegistry): any {
 
 function isFunctionExpression(expression: string): boolean {
   const trimmed = expression.trim();
-  return trimmed.startsWith('function') ||
-    trimmed.startsWith('async function') ||
-    trimmed.startsWith('async (') ||
+  return /^(?:async\s+)?function\b/.test(trimmed) ||
+    /^async(?:\s+[A-Za-z_$][\w$]*|\s*\([^)]*\))\s*=>/.test(trimmed) ||
     trimmed.startsWith('(') ||
     /^\w+\s*=>/.test(trimmed);
 }
