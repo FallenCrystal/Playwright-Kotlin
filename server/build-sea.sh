@@ -20,7 +20,7 @@ to_native_path() {
   fi
 }
 
-NODE_VERSION="v22.12.0"
+NODE_VERSION="v24.21.0"
 BUILD_DIR="$SCRIPT_DIR/build"
 BUNDLE_FILE="$SCRIPT_DIR/bundle/server-bundle.js"
 

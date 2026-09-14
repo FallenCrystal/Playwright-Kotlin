@@ -7,6 +7,7 @@ build/
 .idea/
 *.iml
 .vscode/
+.claude/
 
 # Node
 server/node_modules/

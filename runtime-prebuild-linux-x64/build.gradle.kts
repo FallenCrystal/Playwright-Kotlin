@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
-val jvmTarget: String by project
+val jvmTarget = providers.gradleProperty("jvmTarget").get()
 
 plugins {
     kotlin("jvm")
@@ -19,7 +19,8 @@ tasks.withType<KotlinJvmCompile>().configureEach {
 
 mavenPublishing {
     configure(com.vanniktech.maven.publish.JavaLibrary(
-        com.vanniktech.maven.publish.JavadocJar.Javadoc(), true
+        com.vanniktech.maven.publish.JavadocJar.Javadoc(),
+        com.vanniktech.maven.publish.SourcesJar.Sources(),
     ))
     coordinates(project.group.toString(), "playwright-kotlin-runtime-prebuild-linux-x64", project.version.toString())
 }
@@ -42,7 +43,7 @@ val gitBash = if (org.gradle.internal.os.OperatingSystem.current().isWindows) {
     "bash"
 }
 
-val buildNativeServer by tasks.registering(Exec::class) {
+val buildNativeServer = tasks.register<Exec>("buildNativeServer") {
     description = "Build native server binary for linux-x64 using Node.js SEA"
     dependsOn(":bundleServer")
     workingDir = serverDir
@@ -52,7 +53,7 @@ val buildNativeServer by tasks.registering(Exec::class) {
     outputs.file(serverDir.resolve("build/playwright-server-linux-x64"))
 }
 
-val copyNativeBinary by tasks.registering(Copy::class) {
+val copyNativeBinary = tasks.register<Copy>("copyNativeBinary") {
     description = "Copy linux-x64 native binary into JAR resources"
     dependsOn(buildNativeServer)
 

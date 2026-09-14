@@ -10,7 +10,7 @@ await build({
   entryPoints: ['dist/index.js'],
   bundle: true,
   platform: 'node',
-  target: 'node22',
+  target: 'node24',
   outfile: 'bundle/server-bundle.js',
   format: 'cjs',
   external: [
@@ -21,21 +21,19 @@ await build({
   ],
   plugins: [
     {
-      name: 'fix-playwright-core-resolve',
+      name: 'fix-playwright-core-bundle',
       setup(build) {
-        // Patch nodePlatform.js to replace the problematic require.resolve
-        // with a direct __dirname reference (since everything is bundled)
-        const nodePlatformPath = path.resolve(
-          __dirname, 'node_modules/playwright-core/lib/server/utils/nodePlatform.js'
-        );
-        build.onLoad({ filter: /nodePlatform\.js$/ }, async (args) => {
-          if (args.path !== nodePlatformPath) return null;
+        build.onLoad({ filter: /coreBundle\.js$/ }, async (args) => {
           let contents = fs.readFileSync(args.path, 'utf-8');
-          // Replace: const coreDir = path.dirname(require.resolve("../../../package.json"));
-          // With: const coreDir = __dirname;  (since the bundle is a single file)
+          // Replace dynamic require of browsers.json and package.json with static relative requires
+          // so that esbuild can inline them into the bundle.
           contents = contents.replace(
-            /const coreDir = .*require\.resolve\("\.\.\/\.\.\/\.\.\/package\.json"\).*\);/,
-            'const coreDir = __dirname;'
+            /require\([a-zA-Z0-9_]+\.default\.join\(packageRoot, "browsers\.json"\)\)/g,
+            'require("../browsers.json")'
+          );
+          contents = contents.replace(
+            /require\([a-zA-Z0-9_]+\.default\.join\(packageRoot, "package\.json"\)\)/g,
+            'require("../package.json")'
           );
           return { contents, loader: 'js' };
         });

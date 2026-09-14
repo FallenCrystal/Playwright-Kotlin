@@ -1,7 +1,7 @@
 plugins {
     kotlin("jvm") version "2.3.0" apply false
     kotlin("plugin.serialization") version "2.3.0" apply false
-    id("com.vanniktech.maven.publish.base") version "0.34.0" apply false
+    id("com.vanniktech.maven.publish.base") version "0.37.0" apply false
 }
 
 allprojects {
@@ -18,7 +18,7 @@ allprojects {
 val serverDir = rootProject.projectDir.resolve("server")
 val npm = if (org.gradle.internal.os.OperatingSystem.current().isWindows) "npm.cmd" else "npm"
 
-val npmInstall by tasks.registering(Exec::class) {
+val npmInstall = tasks.register<Exec>("npmInstall") {
     description = "Install server npm dependencies"
     workingDir = serverDir
     commandLine(npm, "ci", "--no-audit", "--no-fund")
@@ -27,7 +27,7 @@ val npmInstall by tasks.registering(Exec::class) {
     outputs.dir(serverDir.resolve("node_modules"))
 }
 
-val buildServer by tasks.registering(Exec::class) {
+val buildServer = tasks.register<Exec>("buildServer") {
     description = "Compile TypeScript server to dist/"
     dependsOn(npmInstall)
     workingDir = serverDir
@@ -41,7 +41,7 @@ val buildServer by tasks.registering(Exec::class) {
     }
 }
 
-val bundleServer by tasks.registering(Exec::class) {
+val bundleServer = tasks.register<Exec>("bundleServer") {
     description = "Bundle server into single JS file"
     dependsOn(buildServer)
     workingDir = serverDir

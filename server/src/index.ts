@@ -4,10 +4,10 @@ const args = process.argv.slice(2);
 
 if (args.includes('--install-browsers')) {
   // Install browsers using playwright-core's registry API
-  const { installBrowsersForNpmInstall } = require('playwright-core/lib/server/registry/index') as {
-    installBrowsersForNpmInstall: () => Promise<void>
+  const { registry } = require('playwright-core/lib/coreBundle') as {
+    registry: { installBrowsersForNpmInstall: () => Promise<void> }
   };
-  installBrowsersForNpmInstall()
+  registry.installBrowsersForNpmInstall()
     .then(() => {
       console.log('Browsers installed successfully.');
       process.exit(0);
