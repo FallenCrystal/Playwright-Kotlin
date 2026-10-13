@@ -22,6 +22,7 @@ export async function BrowserHandler(
       if (params.javaScriptEnabled !== undefined) options.javaScriptEnabled = params.javaScriptEnabled;
       if (params.bypassCSP !== undefined) options.bypassCSP = params.bypassCSP;
       if (params.deviceScaleFactor !== undefined) options.deviceScaleFactor = params.deviceScaleFactor;
+      if (params.proxy) options.proxy = params.proxy;
 
       const context = await browser.newContext(options);
       const contextGuid = registry.register(context, 'BrowserContext');
@@ -47,6 +48,7 @@ export async function BrowserHandler(
       if (params.javaScriptEnabled !== undefined) options.javaScriptEnabled = params.javaScriptEnabled;
       if (params.bypassCSP !== undefined) options.bypassCSP = params.bypassCSP;
       if (params.deviceScaleFactor !== undefined) options.deviceScaleFactor = params.deviceScaleFactor;
+      if (params.proxy) options.proxy = params.proxy;
 
       // newPage creates context + page
       const context = await browser.newContext(options);

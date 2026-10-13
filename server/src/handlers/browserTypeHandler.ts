@@ -21,6 +21,7 @@ export async function BrowserTypeHandler(
       if (params.ignoreDefaultArgs !== undefined) options.ignoreDefaultArgs = params.ignoreDefaultArgs;
       if (params.timeout !== undefined) options.timeout = params.timeout;
       if (params.slowMo !== undefined) options.slowMo = params.slowMo;
+      if (params.proxy) options.proxy = params.proxy;
 
       const browser = await browserType.launch(options);
       const browserGuid = registry.register(browser, 'Browser');
@@ -53,6 +54,7 @@ export async function BrowserTypeHandler(
       if (params.javaScriptEnabled !== undefined) options.javaScriptEnabled = params.javaScriptEnabled;
       if (params.bypassCSP !== undefined) options.bypassCSP = params.bypassCSP;
       if (params.deviceScaleFactor !== undefined) options.deviceScaleFactor = params.deviceScaleFactor;
+      if (params.proxy) options.proxy = params.proxy;
 
       const context = await browserType.launchPersistentContext(params.userDataDir, options);
       const contextGuid = registry.register(context, 'BrowserContext');

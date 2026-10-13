@@ -26,6 +26,14 @@ class Browser(
             options.javaScriptEnabled?.let { put("javaScriptEnabled", it) }
             options.bypassCSP?.let { put("bypassCSP", it) }
             options.deviceScaleFactor?.let { put("deviceScaleFactor", it) }
+            options.proxy?.let {
+                put("proxy", buildJsonObject {
+                    put("server", it.server)
+                    it.bypass?.let { b -> put("bypass", b) }
+                    it.username?.let { u -> put("username", u) }
+                    it.password?.let { p -> put("password", p) }
+                })
+            }
         }
         val contextGuid = extractGuid(result)!!
         return BrowserContext(connection, contextGuid)
@@ -46,6 +54,14 @@ class Browser(
             options.javaScriptEnabled?.let { put("javaScriptEnabled", it) }
             options.bypassCSP?.let { put("bypassCSP", it) }
             options.deviceScaleFactor?.let { put("deviceScaleFactor", it) }
+            options.proxy?.let {
+                put("proxy", buildJsonObject {
+                    put("server", it.server)
+                    it.bypass?.let { b -> put("bypass", b) }
+                    it.username?.let { u -> put("username", u) }
+                    it.password?.let { p -> put("password", p) }
+                })
+            }
         }
         val pageGuid = extractGuid(result)!!
         val frameGuid = result?.jsonObject?.get("frameGuid")?.jsonPrimitive?.content

@@ -22,6 +22,14 @@ class BrowserType(
             options.ignoreDefaultArgs?.let { put("ignoreDefaultArgs", JsonArray(it.map { a -> JsonPrimitive(a) })) }
             options.timeout?.let { put("timeout", it) }
             options.slowMo?.let { put("slowMo", it) }
+            options.proxy?.let {
+                put("proxy", buildJsonObject {
+                    put("server", it.server)
+                    it.bypass?.let { b -> put("bypass", b) }
+                    it.username?.let { u -> put("username", u) }
+                    it.password?.let { p -> put("password", p) }
+                })
+            }
         }
         val browserGuid = extractGuid(result)!!
         return Browser(connection, browserGuid)
@@ -53,6 +61,14 @@ class BrowserType(
             options.javaScriptEnabled?.let { put("javaScriptEnabled", it) }
             options.bypassCSP?.let { put("bypassCSP", it) }
             options.deviceScaleFactor?.let { put("deviceScaleFactor", it) }
+            options.proxy?.let {
+                put("proxy", buildJsonObject {
+                    put("server", it.server)
+                    it.bypass?.let { b -> put("bypass", b) }
+                    it.username?.let { u -> put("username", u) }
+                    it.password?.let { p -> put("password", p) }
+                })
+            }
         }
         val contextGuid = extractGuid(result)!!
         return BrowserContext(connection, contextGuid)

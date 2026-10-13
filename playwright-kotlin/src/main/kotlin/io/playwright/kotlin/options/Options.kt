@@ -2,6 +2,13 @@ package io.playwright.kotlin.options
 
 import io.playwright.kotlin.types.ViewportSize
 
+data class Proxy(
+    val server: String,
+    val bypass: String? = null,
+    val username: String? = null,
+    val password: String? = null
+)
+
 data class LaunchOptions(
     val headless: Boolean? = null,
     val channel: String? = null,
@@ -9,7 +16,8 @@ data class LaunchOptions(
     val args: List<String>? = null,
     val ignoreDefaultArgs: List<String>? = null,
     val timeout: Double? = null,
-    val slowMo: Double? = null
+    val slowMo: Double? = null,
+    val proxy: Proxy? = null
 )
 
 data class BrowserContextOptions(
@@ -20,7 +28,8 @@ data class BrowserContextOptions(
     val ignoreHTTPSErrors: Boolean? = null,
     val javaScriptEnabled: Boolean? = null,
     val bypassCSP: Boolean? = null,
-    val deviceScaleFactor: Double? = null
+    val deviceScaleFactor: Double? = null,
+    val proxy: Proxy? = null
 )
 
 data class NavigationOptions(
@@ -88,5 +97,6 @@ data class LaunchPersistentContextOptions(
     val ignoreHTTPSErrors: Boolean? = null,
     val javaScriptEnabled: Boolean? = null,
     val bypassCSP: Boolean? = null,
-    val deviceScaleFactor: Double? = null
+    val deviceScaleFactor: Double? = null,
+    val proxy: Proxy? = null
 )
